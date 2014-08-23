@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+. env.properties
+
+prefix="${NGINX_PREFIX%/}"
+tag="$NAME:$TAG"
+
+docker rmi $tag
+docker build --tag=$tag --force-rm=true - <<EOF
+
+FROM ubuntu:14.04
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get -y update
+RUN apt-get -y install uwsgi
+
+ADD $prefix $prefix
+
+EOF
+
+
