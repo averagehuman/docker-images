@@ -4,6 +4,6 @@ nginx:
 	@./bin/build-nginx
 
 .PHONY: image
-image: nginx
+image:
 	@./bin/build-image
 

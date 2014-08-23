@@ -6,6 +6,7 @@ set -e
 
 
 if [ -e "$NGINX_PREFIX" ]; then
+    echo "Installation directory exists - '$NGINX_PREFIX'"
     exit 0
 fi
 
@@ -25,9 +26,12 @@ fi
 
 tar xzvf $archive
 
+apt-get -y install build-essential zlib1g zlib1g-dev libpcre3 libpcre3-dev
+apt-get -y install libgd3 libgeoip1 libgeoip-dev libssl1.0.0 libxml2 libxslt1.1
+
 pushd $version
 ./configure --prefix="$prefix" \
-            --sbin-path="$prefix/bin" \
+            --sbin-path="$prefix/bin/nginx" \
             --with-http_ssl_module \
             --without-http_scgi_module \
             --without-http_ssi_module \

@@ -1,14 +1,39 @@
 #!/bin/bash
 
-set -e
 
 . env.properties
 
+set -e
+
+quote() {
+    #Riccardo Galli - stackoverflow.com
+    sed 's/[]\.|$(){}?+*^]/\\&/g' <<< "$*"
+}
+
 prefix="${NGINX_PREFIX%/}"
 tag="$NAME:$TAG"
+noclobber=$(echo $NOCLOBBER | tr '[:upper:]' '[:lower:]')
+noclobber=${noclobber:-true}
 
-docker rmi $tag
-docker build --tag=$tag --force-rm=true - <<EOF
+if [ $(docker images | awk '{print $1":"$2}' | grep -x "$(quote $tag)") ]; then
+    if [ "$noclobber" = "true" ]; then
+        echo "Image '$tag' exists"
+        exit 1
+    fi
+    if [ "$noclobber" = "false" ]; then
+        docker rmi -f $tag
+    else
+        echo "Config Error - NOCLOBBER must be 'true' or 'false'"
+        exit 1
+    fi
+fi
+
+
+mkdir -p src
+rm -rf src/nginx
+cp -r $prefix src/nginx
+
+cat > src/Dockerfile <<EOF
 
 FROM ubuntu:14.04
 
@@ -17,8 +42,9 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update
 RUN apt-get -y install uwsgi
 
-ADD $prefix $prefix
+COPY nginx $prefix
 
 EOF
 
+docker build --tag=$tag --force-rm src
 
