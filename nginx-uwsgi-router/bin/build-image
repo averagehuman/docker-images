@@ -1,9 +1,9 @@
 #!/bin/bash
 
 
-. env.properties
-
 set -e
+
+. env.properties
 
 quote() {
     #Riccardo Galli - stackoverflow.com
@@ -21,6 +21,7 @@ if [ $(docker images | awk '{print $1":"$2}' | grep -x "$(quote $tag)") ]; then
         exit 1
     fi
     if [ "$noclobber" = "false" ]; then
+	docker ps -a | grep Exit | awk '{print $1}' | xargs docker rm
         docker rmi -f $tag
     else
         echo "Config Error - NOCLOBBER must be 'true' or 'false'"
