@@ -1,4 +1,7 @@
 
+SHELL := /bin/bash
+
+include build.properties
 include env.properties
 
 .PHONY: nginx
@@ -19,4 +22,8 @@ nginx:
 .PHONY: image
 image: nginx
 	@./bin/build-image --name=$(NAME) --tag=$(TAG) --nginx-prefix=$(NGINX_PREFIX)
+
+.PHONY: rmi
+rmi:
+	@source ../etc/docker/common.sh && remove_image "$(NAME):$(TAG)"
 
