@@ -3,28 +3,58 @@
 
 set -e
 
-. env.properties
+name=
+tag=
+nginx_prefix=
+noclobber=
+args=
 
-quote() {
-    #Riccardo Galli - stackoverflow.com
-    sed 's/[]\.|$(){}?+*^]/\\&/g' <<< "$*"
-}
+while [ $# -gt 0 ]; do
 
-prefix="${NGINX_PREFIX%/}"
-tag="$NAME:$TAG"
-noclobber=$(echo $NOCLOBBER | tr '[:upper:]' '[:lower:]')
+    case $1 in
+
+	    --name=*)
+		name=${1#--name=}
+	    ;;
+
+	    --tag=*)
+		tag=${1#--tag=}
+	    ;;
+
+	    --nginx-prefix=*)
+		nginx_prefix=${1#--nginx-prefix=}
+	    ;;
+
+	    --noclobber=*)
+		noclobber=${1#--noclobber=}
+	    ;;
+
+	    *)
+		args="$args $1"
+	    ;;
+
+    esac
+
+    shift
+
+done
+
+
+tag="$name:$tag"
+noclobber=$(echo $noclobber | tr '[:upper:]' '[:lower:]')
 noclobber=${noclobber:-true}
 
-if [ $(docker images | awk '{print $1":"$2}' | grep -x "$(quote $tag)") ]; then
+. ../etc/docker/common.sh
+
+if [ "$(exists $1)" = "y" ]; then
     if [ "$noclobber" = "true" ]; then
         echo "Image '$tag' exists"
         exit 1
     fi
     if [ "$noclobber" = "false" ]; then
-	docker ps -a | grep Exit | awk '{print $1}' | xargs docker rm
-        docker rmi -f $tag
+	rmi $tag
     else
-        echo "Config Error - NOCLOBBER must be 'true' or 'false'"
+        echo "Parameter value error - expected 'true' or 'false', got '$noclobber'"
         exit 1
     fi
 fi
@@ -32,9 +62,11 @@ fi
 
 mkdir -p src
 rm -rf src/nginx
-cp -r $prefix src/nginx
+cp -r $nginx_prefix src/nginx
 
 cat > src/Dockerfile <<EOF
+
+# Generated Dockerfile - do not edit!
 
 FROM ubuntu:14.04
 
@@ -43,7 +75,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update
 RUN apt-get -y install uwsgi
 
-COPY nginx $prefix
+COPY nginx $nginx_prefix
 
 EOF
 
