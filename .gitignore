@@ -20,4 +20,5 @@ local_settings.py
 db_settings.py
 log
 .site.cfg
+*/src/nginx
 
