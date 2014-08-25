@@ -43,5 +43,14 @@ rmi:
 
 .PHONY: run
 run:
-	@docker run -i -t $(NAME):$(TAG) /bin/bash
+	@docker run -i -t --rm $(NAME):$(TAG) /bin/bash
+
+.PHONY: purge
+purge:
+	@rm -rf $(NGINX_PREFIX)
+	@rm -rf $(DOCKER_SOURCE)/nginx
+	@rm -f $(DOCKER_SOURCE)/uwsgi
+
+.PHONY: fresh
+fresh: purge rmi image
 
