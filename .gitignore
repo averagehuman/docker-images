@@ -21,4 +21,5 @@ db_settings.py
 log
 .site.cfg
 */src/nginx
+*/src/uwsgi
 
