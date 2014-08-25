@@ -6,7 +6,7 @@ include env.properties
 
 .PHONY: nginx
 nginx:
-	@if [ ! -e $(NGINX_PREFIX) ]; then \
+	@if [ ! -e "$(NGINX_PREFIX)" ]; then \
 		cd $(NGINX_SUPPORT) && ./install.sh \
 		--version=$(NGINX_VERSION) \
 		--prefix=$(NGINX_PREFIX) \
@@ -17,10 +17,18 @@ nginx:
 		--add-module=$(NGINX_SUPPORT)/ngx_http_set_hash-0.2.1 \
 		--add-module=$(NGINX_SUPPORT)/echo-nginx-module-0.55 \
 		--add-module=$(NGINX_SUPPORT)/vkholodkov-nginx-upload-module-2.2-ed996c4f7f \
-	fi
+	;fi
+
+.PHONY: uwsgi
+uwsgi:
+	@if [ ! -e "$(UWSGI_LOCAL_BINARY)" ]; then \
+		cd $(UWSGI_SUPPORT) && ./install.sh \
+		--version=$(UWSGI_VERSION) \
+		--binary-path=$(UWSGI_LOCAL_BINARY) \
+	;fi
 
 .PHONY: image
-image: nginx
+image: nginx uwsgi
 	@./bin/build-image --name=$(NAME) --tag=$(TAG) --nginx-prefix=$(NGINX_PREFIX)
 
 .PHONY: rmi
