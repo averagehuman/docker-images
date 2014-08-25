@@ -17,7 +17,9 @@ remove_image() {
     if [ $? -eq 0 ]; then
         docker ps -a | grep Exited | awk '{print $1}' | xargs docker rm
     fi
-    docker rmi -f $1
+    if [ "$(exists $1)" = "y" ]; then
+        docker rmi -f $1
+    fi
 }
 
 
