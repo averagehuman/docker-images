@@ -16,8 +16,14 @@ nginx:
 		--add-module=$(NGINX_SUPPORT)/ngx_devel_kit-0.2.19 \
 		--add-module=$(NGINX_SUPPORT)/ngx_http_set_hash-0.2.1 \
 		--add-module=$(NGINX_SUPPORT)/echo-nginx-module-0.55 \
-		--add-module=$(NGINX_SUPPORT)/vkholodkov-nginx-upload-module-2.2-ed996c4f7f \
+		--add-module=$(NGINX_SUPPORT)/vkholodkov-nginx-upload-module-2.2-ed996c4f7f && \
+		rm -rf $(DOCKER_SOURCE)/nginx \
 	;fi
+	@if [ ! -e $(DOCKER_SOURCE)/nginx ]; then \
+		cp -r $(NGINX_PREFIX) $(DOCKER_SOURCE)/nginx \
+	;fi
+	@sed -e "s;%PREFIX%;$(NGINX_PREFIX);g" nginx.conf.template > $(DOCKER_SOURCE)/nginx/conf/nginx.conf
+
 
 .PHONY: uwsgi
 uwsgi:
@@ -34,4 +40,8 @@ image: nginx uwsgi
 .PHONY: rmi
 rmi:
 	@source ../etc/docker/common.sh && remove_image "$(NAME):$(TAG)"
+
+.PHONY: run
+run:
+	@docker run -i -t $(NAME):$(TAG) /bin/bash
 

@@ -1,0 +1,37 @@
+daemon                  off;
+master_process          on;
+worker_processes        1;
+pid                     nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include             %PREFIX%/conf/mime.types;
+
+    access_log          %PREFIX%/logs/access.log;
+    error_log           %PREFIX%/logs/error.log;
+
+    default_type        application/octet-stream;
+    gzip                on;
+    sendfile            on;
+    keepalive_timeout   65;
+
+    server {
+        listen 80 default;
+        server_name *;
+
+        location / {
+            include     %PREFIX%/conf/uwsgi_params;
+            uwsgi_pass  unix:/run/uwsgi-router.sock;
+            include uwsgi_params;
+        }
+
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root %PREFIX%/html;
+        }
+    }
+}

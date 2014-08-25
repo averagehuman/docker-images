@@ -52,7 +52,7 @@ if [ "$(exists $1)" = "y" ]; then
         exit 1
     fi
     if [ "$noclobber" = "false" ]; then
-	rmi $tag
+        rmi $tag
     else
         echo "Parameter value error - expected 'true' or 'false', got '$noclobber'"
         exit 1
@@ -61,8 +61,6 @@ fi
 
 
 mkdir -p src
-rm -rf src/nginx
-cp -r $nginx_prefix src/nginx
 
 cat > src/Dockerfile <<EOF
 
@@ -73,9 +71,19 @@ FROM ubuntu:14.04
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get -y update
-RUN apt-get -y install uwsgi
+RUN apt-get -y install python python-dev
+RUN apt-get -y install supervisor
 
 COPY nginx $nginx_prefix
+COPY uwsgi /usr/local/bin/uwsgi
+COPY supervisor.conf /etc/supervisor/conf.d/frontend.conf
+RUN ln -s $nginx_prefix/bin/nginx /usr/local/bin/nginx
+
+RUN mkdir /var/www
+
+EXPOSE 80 3030
+
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisor.conf"]
 
 EOF
 
