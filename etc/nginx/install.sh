@@ -41,14 +41,14 @@ if [ ! $prefix ]; then echo "--prefix is required"; exit 1; fi
 
 # remove trailing slash
 prefix="${prefix%/}"
-version="nginx-${version}"
+package="nginx-${version}"
 module_root="$(pwd)"
 
 
-archive="${version}.tar.gz"
+archive="${package}.tar.gz"
 url="http://nginx.org/download/${archive}"
 
-rm -rf $version
+rm -rf $package
 
 if [ ! -e $archive ]; then
     wget -O $archive $url
@@ -59,12 +59,12 @@ tar xzvf $archive
 apt-get -y install build-essential zlib1g zlib1g-dev libpcre3 libpcre3-dev
 apt-get -y install libgd3 libgeoip1 libgeoip-dev libssl1.0.0 libxml2 libxslt1.1
 
-pushd $version
+pushd $package
 ./configure --prefix="$prefix" --sbin-path="$prefix/bin/nginx" $args
 make build
 make install
 popd
 
-rm -rf $version
+rm -rf $package
 rm -rf $archive
 
