@@ -33,13 +33,17 @@ uwsgi:
 		--binary-path=$(UWSGI_LOCAL_BINARY) \
 	;fi
 
-.PHONY: image
-image: nginx uwsgi
-	@./bin/build-image --name=$(NAME) --tag=$(TAG) --nginx-prefix=$(NGINX_PREFIX)
+.PHONY: exists
+exists:
+	@source ../etc/docker/common.sh && image_exists "$(NAME):$(TAG)" "To delete the image run 'make rmi'"
 
 .PHONY: rmi
 rmi:
 	@source ../etc/docker/common.sh && remove_image "$(NAME):$(TAG)"
+
+.PHONY: image
+image: exists nginx uwsgi
+	@./bin/build-image --name=$(NAME) --tag=$(TAG) --nginx-prefix=$(NGINX_PREFIX)
 
 .PHONY: run
 run:

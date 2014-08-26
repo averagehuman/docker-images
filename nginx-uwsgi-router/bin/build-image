@@ -34,13 +34,19 @@ while [ $# -gt 0 ]; do
 
 done
 
+if [ ! $name ]; then echo "--name is required"; exit 1; fi
+if [ ! $nginx_prefix ]; then echo "--nginx-prefix is required"; exit 1; fi
 
-tag="$name:$tag"
+
+if [ $tag ]; then
+    name="$name:$tag"
+fi
 
 . ../etc/docker/common.sh
 
-if [ "$(exists $1)" = "y" ]; then
-    echo "Image '$tag' exists. To delete it run 'make rmi'."
+
+if [ $(image_exists "$name") -ne 0 ]; then
+    echo "Image '$name' exists. To delete it run 'make rmi'."
     exit 1
 fi
 
@@ -72,5 +78,5 @@ CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisor.conf"]
 
 EOF
 
-docker build --tag=$tag --force-rm src
+docker build --tag=$name --force-rm src
 
