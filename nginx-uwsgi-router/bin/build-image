@@ -6,7 +6,6 @@ set -e
 name=
 tag=
 nginx_prefix=
-noclobber=
 args=
 
 while [ $# -gt 0 ]; do
@@ -25,10 +24,6 @@ while [ $# -gt 0 ]; do
 		nginx_prefix=${1#--nginx-prefix=}
 	    ;;
 
-	    --noclobber=*)
-		noclobber=${1#--noclobber=}
-	    ;;
-
 	    *)
 		args="$args $1"
 	    ;;
@@ -41,22 +36,12 @@ done
 
 
 tag="$name:$tag"
-noclobber=$(echo $noclobber | tr '[:upper:]' '[:lower:]')
-noclobber=${noclobber:-true}
 
 . ../etc/docker/common.sh
 
 if [ "$(exists $1)" = "y" ]; then
-    if [ "$noclobber" = "true" ]; then
-        echo "Image '$tag' exists"
-        exit 1
-    fi
-    if [ "$noclobber" = "false" ]; then
-        rmi $tag
-    else
-        echo "Parameter value error - expected 'true' or 'false', got '$noclobber'"
-        exit 1
-    fi
+    echo "Image '$tag' exists. To delete it run 'make rmi'."
+    exit 1
 fi
 
 
