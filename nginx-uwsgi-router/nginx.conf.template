@@ -19,19 +19,46 @@ http {
     sendfile            on;
     keepalive_timeout   65;
 
+	server {
+	    server_name ~^www\.(?<domain>.+)$;
+
+		return 301 $scheme://$domain$request_uri;
+	}
+
     server {
-        listen 80 default;
         server_name _;
+		root /var/www;
+
+        error_page 500 502 503 504 /50x.html;
+		error_page 404 /404.html;
+
+        location ~* \.html$ {
+            internal;
+        }
+
+        location /assets {
+			alias /var/www/assets;
+			expires max;
+		}
+
+		location /media  {
+			alias /var/www/media/$host;
+			expires max;
+		}
+
+		location = /favicon.ico {
+			try_files /media/favicon.ico /assets/favicon.ico =404;
+		}
 
         location / {
+			try_files $uri @proxy;
+		}
+
+        location @proxy {
             include     %PREFIX%/conf/uwsgi_params;
-            uwsgi_pass  unix:/run/uwsgi-router.sock;
+            uwsgi_pass  unix:/var/run/uwsgi-router.sock;
             include uwsgi_params;
         }
 
-        error_page 500 502 503 504 /50x.html;
-        location = /50x.html {
-            root %PREFIX%/html;
-        }
     }
 }
