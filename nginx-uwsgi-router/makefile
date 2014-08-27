@@ -52,11 +52,11 @@ image: exists nginx uwsgi
 
 .PHONY: shell
 shell:
-	@docker run -i -t --rm $(NAME):$(TAG) /bin/bash
+	@docker run -i -t --rm -p 8080:80 -p 3030:3030 -v /srv/www:/var/www $(NAME):$(TAG) /bin/bash
 
 .PHONY: run
 run:
-	@docker run --detach=true -P $(NAME):$(TAG)
+	@docker run -d -P --name=router $(NAME):$(TAG)
 
 .PHONY: purge
 purge:
