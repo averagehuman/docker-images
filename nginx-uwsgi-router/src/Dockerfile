@@ -14,7 +14,6 @@ COPY uwsgi /usr/local/bin/uwsgi
 COPY supervisor.conf /etc/supervisor/conf.d/frontend.conf
 RUN ln -s /opt/nginx-1.6.1-demo/bin/nginx /usr/local/bin/nginx
 
-RUN mkdir /var/www
 
 EXPOSE 80 3030
 

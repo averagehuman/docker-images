@@ -70,7 +70,6 @@ COPY uwsgi /usr/local/bin/uwsgi
 COPY supervisor.conf /etc/supervisor/conf.d/frontend.conf
 RUN ln -s $nginx_prefix/bin/nginx /usr/local/bin/nginx
 
-RUN mkdir /var/www
 
 EXPOSE 80 3030
 

@@ -12,7 +12,12 @@ nginx:
 		--prefix=$(NGINX_PREFIX) \
 		--with-http_ssl_module \
 		--without-http_scgi_module \
+		--without-http_fastcgi_module \
 		--without-http_ssi_module \
+		--without-http_proxy_module \
+		--without-mail_pop3_module \
+		--without-mail_smtp_module \
+		--without-mail_imap_module \
 		--add-module=$(NGINX_SUPPORT)/ngx_devel_kit-0.2.19 \
 		--add-module=$(NGINX_SUPPORT)/ngx_http_set_hash-0.2.1 \
 		--add-module=$(NGINX_SUPPORT)/echo-nginx-module-0.55 \
@@ -45,9 +50,13 @@ rmi:
 image: exists nginx uwsgi
 	@./bin/build-image --name=$(NAME) --tag=$(TAG) --nginx-prefix=$(NGINX_PREFIX)
 
+.PHONY: shell
+shell:
+	@docker run -i -t --rm $(NAME):$(TAG) /bin/bash
+
 .PHONY: run
 run:
-	@docker run -i -t --rm $(NAME):$(TAG) /bin/bash
+	@docker run --detach=true -P $(NAME):$(TAG)
 
 .PHONY: purge
 purge:
