@@ -69,11 +69,12 @@ COPY nginx $nginx_prefix
 COPY uwsgi /usr/local/bin/uwsgi
 COPY supervisor.conf /etc/supervisor/conf.d/frontend.conf
 RUN ln -s $nginx_prefix/bin/nginx /usr/local/bin/nginx
+RUN mkdir -p /var/www
 
 
 EXPOSE 80 3030
 
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisor.conf"]
+CMD /usr/bin/supervisord -n -c /etc/supervisor/supervisor.conf
 
 EOF
 

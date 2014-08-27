@@ -17,5 +17,5 @@ RUN ln -s /opt/nginx-1.6.1-demo/bin/nginx /usr/local/bin/nginx
 
 EXPOSE 80 3030
 
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisor.conf"]
+CMD /usr/bin/supervisord -n -c /etc/supervisor/supervisor.conf
 
