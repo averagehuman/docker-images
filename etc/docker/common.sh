@@ -21,13 +21,12 @@ fail_if_image_exists() {
 }
 
 remove_image() {
-    docker ps -a | grep Exited > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        docker ps -a | grep Exited | awk '{print $1}' | xargs docker rm
-    fi
-    image_exists "$1" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        docker rmi -f "$1"
+    if [ $(image_exists $1) -eq 1 ]; then
+		docker ps -a | grep Exited > /dev/null 2>&1
+		if [ $? -eq 0 ]; then
+			docker ps -a | grep Exited | awk '{print $1}' | xargs docker rm
+		fi
+		docker rmi -f "$1"
     fi
 }
 
