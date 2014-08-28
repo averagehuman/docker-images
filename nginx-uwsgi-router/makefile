@@ -56,7 +56,7 @@ shell:
 
 .PHONY: run
 run:
-	@docker run -d -P --name=router $(NAME):$(TAG)
+	@docker run -d -P --name=router -v /srv/www:/var/www $(NAME):$(TAG)
 
 .PHONY: purge
 purge:
