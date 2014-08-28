@@ -40,13 +40,13 @@ uwsgi:
 
 .PHONY: exists
 exists:
-	@source ../etc/docker/common.sh && image_exists "$(NAME)" "To delete the image run 'make rmi'"
+	@source ../etc/docker/common.sh && fail_if_image_exists "$(NAME)" "To delete the image run 'make rmi'"
 
 .PHONY: rmi
 rmi:
 	@source ../etc/docker/common.sh && remove_image "$(NAME)"
 
-.PHONY: image
+.PHONY: build
 build: exists nginx uwsgi
 	@sed -e "s;%%NAME%%;$(NAME);g" dockerfile.template > $(DOCKER_SOURCE)/Dockerfile
 	@sed -i -e "s;%%NGINX_PREFIX%%;$(NGINX_PREFIX);g" $(DOCKER_SOURCE)/Dockerfile
