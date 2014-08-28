@@ -9,10 +9,10 @@ events {
 
 
 http {
-    include             %PREFIX%/conf/mime.types;
+    include             %%PREFIX%%/conf/mime.types;
 
-    access_log          %PREFIX%/logs/access.log;
-    error_log           %PREFIX%/logs/error.log;
+    access_log          %%PREFIX%%/logs/access.log;
+    error_log           %%PREFIX%%/logs/error.log;
 
     default_type        application/octet-stream;
     gzip                on;
@@ -62,7 +62,7 @@ http {
     server {
 	    listen 80 default_server;
         server_name _;
-        root /var/www;
+        root /srv/www;
 
         error_page 500 502 503 504 /50x.html;
         error_page 404 /404.html;
@@ -73,12 +73,12 @@ http {
         }
 
         location /assets {
-            alias /var/www/assets;
+            alias /srv/www/assets;
             expires max;
         }
 
         location /media  {
-            alias /var/www/media/$host;
+            alias /srv/www/media/$host;
             expires max;
         }
 
@@ -96,7 +96,7 @@ http {
             uwsgi_cache_key $scheme$host$request_uri;
             uwsgi_cache_valid  200 301 302 304 30m;
             uwsgi_cache_valid  any 1m;
-            include     %PREFIX%/conf/uwsgi_params;
+            include     %%PREFIX%%/conf/uwsgi_params;
             uwsgi_pass  unix:/var/run/uwsgi-router.sock;
         }
 
