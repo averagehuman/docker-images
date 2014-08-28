@@ -4,7 +4,6 @@
 set -e
 
 name=
-tag=
 nginx_prefix=
 args=
 
@@ -14,10 +13,6 @@ while [ $# -gt 0 ]; do
 
 	    --name=*)
 		name=${1#--name=}
-	    ;;
-
-	    --tag=*)
-		tag=${1#--tag=}
 	    ;;
 
 	    --nginx-prefix=*)
@@ -37,10 +32,6 @@ done
 if [ ! $name ]; then echo "--name is required"; exit 1; fi
 if [ ! $nginx_prefix ]; then echo "--nginx-prefix is required"; exit 1; fi
 
-
-if [ $tag ]; then
-    name="$name:$tag"
-fi
 
 . ../etc/docker/common.sh
 
@@ -68,11 +59,11 @@ RUN apt-get -y install supervisor
 COPY nginx $nginx_prefix
 COPY uwsgi /usr/local/bin/uwsgi
 RUN ln -s $nginx_prefix/bin/nginx /usr/local/bin/nginx
-RUN mkdir -p /var/www
 
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY router.conf /etc/supervisor/conf.d/programs.conf
 
+VOLUME /srv/www
 EXPOSE 80 3030
 
 CMD ["/usr/bin/supervisord"]
