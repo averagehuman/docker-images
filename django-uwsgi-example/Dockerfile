@@ -43,11 +43,15 @@ COPY setup.py /opt/django/setup.py
 COPY instance /opt/django/instance
 COPY vendor /opt/django/vendor
 
-RUN cd /opt/django && orb install --no-index --find-links vendor -r requirements.txt
+WORKDIR /opt/django
+RUN orb install --no-index --find-links vendor zc.buildout
+RUN orb buildout
 
 COPY run-django.sh /usr/bin/django
 COPY run-uwsgi.sh /usr/bin/uwsgi
 
 RUN apt-get -y remove build-essential
+RUN apt-get -y clean
+RUN apt-get -y autoremove
 RUN rm -rf /opt/django/vendor
 
