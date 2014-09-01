@@ -24,5 +24,5 @@ run:
 	@docker run -d -P --name=devpi-server -v /srv/pypi:/srv/pypi $(NAME)
 
 .PHONY: fresh
-fresh: rmi image
+fresh: rmi build
 
