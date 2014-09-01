@@ -67,5 +67,5 @@ purge:
 	@rm -f $(DOCKER_SOURCE)/uwsgi
 
 .PHONY: fresh
-fresh: purge rmi image
+fresh: purge rmi build
 
