@@ -16,11 +16,13 @@ RUN npm install -g bower grunt-cli
 RUN gem install compass
 RUN gem install foundation
 
+COPY run-foundation-container.sh /usr/bin/run-foundation
+RUN chmod +x /usr/bin/run-foundation
+
 RUN adduser --disabled-password --home=/home/bob --gecos "" bob
 
-USER bob
 ENV HOME /home/bob
 WORKDIR /home/bob
 
-ENTRYPOINT ["foundation"]
+ENTRYPOINT ["run-foundation"]
 
