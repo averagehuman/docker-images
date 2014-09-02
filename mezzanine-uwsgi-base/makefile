@@ -1,7 +1,7 @@
 
 SHELL := /bin/bash
 
-include build.properties
+include env.properties
 
 .PHONY: requirements
 requirements:
