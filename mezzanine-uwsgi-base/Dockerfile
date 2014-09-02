@@ -1,6 +1,6 @@
 
 
-# hamcat/django-uwsgi-example:latest
+# hamcat/mezzanine-uwsgi
 
 FROM ubuntu:14.04
 
@@ -37,6 +37,7 @@ RUN apt-get -y install oracle-java7-installer
 # django app
 RUN orb init /opt/django
 COPY bootstrap.py /opt/django/bootstrap.py
+COPY base.cfg /opt/django/base.cfg
 COPY buildout.cfg /opt/django/buildout.cfg
 COPY requirements.txt /opt/django/requirements.txt
 COPY setup.py /opt/django/setup.py
@@ -53,5 +54,4 @@ COPY run-uwsgi.sh /usr/bin/uwsgi
 RUN apt-get -y remove build-essential
 RUN apt-get -y clean
 RUN apt-get -y autoremove
-RUN rm -rf /opt/django/vendor
 
