@@ -44,7 +44,7 @@ COPY instance /opt/django/instance
 COPY vendor /opt/django/vendor
 
 WORKDIR /opt/django
-RUN orb install --no-index --find-links vendor zc.buildout
+RUN orb install --no-index --find-links vendor -r requirements.txt
 RUN orb buildout
 
 COPY run-django.sh /usr/bin/django
