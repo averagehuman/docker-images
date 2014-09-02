@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec docker run -d -p 8080:8080 -v /srv/www:/srv/www --name=django hamcat/mezzanine-uwsgi-example django runserver 0.0.0.0:8080
+

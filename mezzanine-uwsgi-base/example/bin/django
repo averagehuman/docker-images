@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec docker run -i -t --rm -v /srv/www:/srv/www hamcat/mezzanine-uwsgi-example django $@
+
