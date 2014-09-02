@@ -5,7 +5,7 @@ djangorecipe==1.10
 gp.vcsdevelop==2.2.3
 rubygemsrecipe==0.1.8
 
-Mezzanine==3.1.9
+Mezzanine==3.1.10
 Cartridge==0.9.5
 git+git://github.com/jmoiron/johnny-cache.git@django-1.6#egg=johnny-cache
 Pillow==2.5.3
