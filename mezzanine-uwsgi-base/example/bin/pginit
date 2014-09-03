@@ -1,0 +1,117 @@
+#!/bin/sh
+
+role=
+db=
+user=
+
+while [ $# -gt 0 ]; do
+
+    case $1 in
+
+	    --usage|--help)
+		cat - <<-EOF
+		Description: Create a postgres database, role and user and initiate by
+		running `django syncdb`
+		Example: $ ./pginit --role=web --db=example_db --user=someone
+		EOF
+		exit 0
+	    ;;
+	    --role=*)
+		role=${1#--role=}
+	    ;;
+
+	    --db=*)
+		db=${1#--db=}
+	    ;;
+
+	    --user=*)
+		user=${1#--user=}
+	    ;;
+
+	    *)
+		args="$args $1"
+	    ;;
+
+    esac
+
+    shift
+
+done
+
+role=${role:-web}
+if [ ! $db ]; then echo "--db is required"; exit 1; fi
+if [ ! $user ]; then echo "--user is required"; exit 1; fi
+
+
+function drop_pg_database {
+    # params: database
+    exists=$(psql -lqt | cut -d \| -f 1 | grep -w $1 | wc -l);
+    if [ $exists = 1 ]; then
+        psql -c "DROP DATABASE $1"
+    fi
+}
+
+function create_pg_role {
+    exists=$(psql -tqc "select COUNT(1) from pg_roles where rolname='$1'" | sed "s/\s//g")
+    if [ $exists = 0 ]; then
+        echo "creating $1";
+        psql -c "CREATE ROLE \"$1\"";
+    fi
+}
+
+function create_pg_user {
+    # params: username, password, rolename
+    exists=$(psql -tqc "SELECT count(1) FROM pg_catalog.pg_user WHERE usename = '$1'");
+    if [ $exists = 0 ]; then
+        psql -c "CREATE ROLE \"$1\" LOGIN INHERIT PASSWORD '$2'";
+        psql -c "GRANT \"$3\" TO \"$1\"";
+    else
+        psql -c "ALTER ROLE \"$1\" WITH PASSWORD '$2'";
+    fi
+}
+
+function create_pg_database {
+    # params: database, rolename
+    exists=$(psql -lqt | cut -d \| -f 1 | grep -w $1 | wc -l);
+    if [ $exists = 0 ]; then
+        createdb -O "$2" "$1";
+    fi
+}
+
+function reassign_owned {
+    echo "DATABASE: $1 - REASSIGN OWNED BY \"$2\" TO \"$3\""
+    psql -d "$1" -c "REASSIGN OWNED BY \"$2\" TO \"$3\"";
+}
+
+set -e
+
+password=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+
+create_pg_role "$role"
+
+create_pg_user "$user" "$password" "$role"
+create_pg_database "$db" "$role"
+reassign_owned %(NAME)s "%(USER)s" "$role"
+
+cat > db_settings.py <<EOF
+
+DATABASES = {}
+DATABASES['default'] = {
+	ENGINE: 'django.db.backends.postgresql_psycopg2',
+	NAME = '$db',
+	USER = '$user',
+	PASSWORD = '$password',
+	OPTIONS = {'autocommit': True},
+}
+
+EOF
+
+cat > <<EOF
+Database '$db' created.
+Settings written to 'db_settings.py'.
+After updating the docker image with these settings, initialise the database as follows:
+
+	docker run -i -t --rm hamcat/mezzanine-uwsgi-example django syncdb --noinput --traceback --database=$db
+
+EOF
+
