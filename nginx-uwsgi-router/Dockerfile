@@ -11,9 +11,9 @@ RUN apt-get -y update
 RUN apt-get -y install python python-dev
 RUN apt-get -y install supervisor
 
-COPY nginx /opt/nginx-1.6.1
+COPY nginx /opt/nginx
 COPY uwsgi /usr/local/bin/uwsgi
-RUN ln -s /opt/nginx-1.6.1/bin/nginx /usr/local/bin/nginx
+RUN ln -s /opt/nginx/bin/nginx /usr/local/bin/nginx
 
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY router.conf /etc/supervisor/conf.d/programs.conf

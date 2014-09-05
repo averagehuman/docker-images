@@ -2,7 +2,8 @@
 SHELL := /bin/bash
 
 include build.properties
-include env.properties
+
+NGINX_PREFIX := /opt/nginx
 
 .PHONY: nginx
 nginx:
@@ -27,7 +28,6 @@ nginx:
 	@if [ ! -e $(DOCKER_SOURCE)/nginx ]; then \
 		cp -r $(NGINX_PREFIX) $(DOCKER_SOURCE)/nginx \
 	;fi
-	@sed -e "s;%PREFIX%;$(NGINX_PREFIX);g" nginx.conf.template > $(DOCKER_SOURCE)/nginx/conf/nginx.conf
 
 
 .PHONY: uwsgi
@@ -48,8 +48,6 @@ rmi:
 
 .PHONY: build
 build: exists nginx uwsgi
-	@sed -e "s;%%NAME%%;$(NAME);g" dockerfile.template > $(DOCKER_SOURCE)/Dockerfile
-	@sed -i -e "s;%%NGINX_PREFIX%%;$(NGINX_PREFIX);g" $(DOCKER_SOURCE)/Dockerfile
 	@docker build --tag=$(NAME) --force-rm $(DOCKER_SOURCE)
 
 .PHONY: shell
